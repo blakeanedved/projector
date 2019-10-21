@@ -155,7 +155,7 @@ def new_project(project, project_path, github, open_project, attach):
                 print('Invalid value for --github')
                 return
         with open(project_path + '/.gitignore', 'a+') as f:
-            f.write('# ignore projector (my custom project manager) configuration files\n.projector.yml')
+            f.write('\n# ignore projector (my custom project manager) configuration files\n.projector.yml')
     else:
         os.mkdir(project_path)
     with open(project_path + '/.projector.yml', 'w+') as f:
