@@ -13,7 +13,7 @@ githubusername = 'blakeanedved'
 tmuxcommand = 'env TERM=screen-256color-italic tmux'
 
 def open_project(project, attach=True):
-    with open(projectsfile, 'r') as f:
+    with open(projectsfile, 'r+') as f:
         projects = { name : path for name, path in [line.strip().split(' ') for line in f.readlines()]}
         if project not in projects:
             picked_project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ' + projectsfile + ' | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
@@ -67,7 +67,7 @@ def open_project(project, attach=True):
 
 def add_project(project, project_path, open_project_bool, attach):
     projects = []
-    with open(projectsfile, 'r') as f:
+    with open(projectsfile, 'r+') as f:
         projects = [line.strip().split(' ')[0] for line in f.readlines()]
     while project == '' or project in projects:
         project = input('Project Name >> ')
@@ -101,7 +101,7 @@ def add_project(project, project_path, open_project_bool, attach):
 
 def remove_project(project, remove_from_disk):
     projects = []
-    with open(projectsfile, 'r') as f:
+    with open(projectsfile, 'r+') as f:
         projects = { name : path for name, path in [line.strip().split(' ') for line in f.readlines()]}
     if project == '':
         project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ' + projectsfile + ' | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
@@ -109,7 +109,7 @@ def remove_project(project, remove_from_disk):
             print('No project specified, aborting')
             return
     else:
-        with open(projectsfile, 'r') as f:
+        with open(projectsfile, 'r+') as f:
             if project not in projects:
                 print('Project `{}` not found, aborting'.format(project))
                 return
@@ -127,7 +127,7 @@ def remove_project(project, remove_from_disk):
 
 def new_project(project, project_path, github, open_project, attach):
     projects = []
-    with open(projectsfile, 'r') as f:
+    with open(projectsfile, 'r+') as f:
         projects = [line.strip().split(' ')[0] for line in f.readlines()]
     while project == '' or project in projects:
         project = input('Project Name >> ')
