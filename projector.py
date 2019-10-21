@@ -77,7 +77,7 @@ def add_project(project, project_path, open_project_bool, attach):
         if project in projects:
             print('Project `{}` already exists, try again (Enter to abort)'.format(project))
     if project_path == '':
-        project_path = os.popen('find ~/Documents/Projects -type d -maxdepth 1 | fzf --height=20 --layout=reverse --border --preview="cat {}/README.md"').read().strip()
+        project_path = os.popen('find ' + projectsdirectory +' -type d -maxdepth 1 | fzf --height=20 --layout=reverse --border --preview="cat {}/README.md"').read().strip()
         if project_path == '':
             print('No directory selected, aborting')
         else:
@@ -98,6 +98,11 @@ def add_project(project, project_path, open_project_bool, attach):
             f.truncate()
         if open_project_bool:
             open_project(project, attach)
+    if os.path.isdir(os.path.expanduser(project_path) + '/.git'):
+        with open(os.path.expanduser(project_path) + '/.gitignore', 'a+') as f:
+            f.write('\n\n# ignore projector (my custom project manager) configuration files\n.projector.yml')
+    with open(os.path.expanduser(project_path) + '/.projector.yml', 'w+') as f:
+        f.write('select: one\nwins:\n  one:\n    layout: tiled\n    panes:\n      - clear')
 
 def remove_project(project, remove_from_disk):
     projects = []
@@ -154,14 +159,10 @@ def new_project(project, project_path, github, open_project, attach):
             else:
                 print('Invalid value for --github')
                 return
-        with open(project_path + '/.gitignore', 'a+') as f:
-            f.write('\n# ignore projector (my custom project manager) configuration files\n.projector.yml')
     else:
         os.mkdir(project_path)
-    with open(project_path + '/.projector.yml', 'w+') as f:
-        f.write('select: one\nwins:\n  one:\n    layout: tiled\n    panes:\n      - clear')
-    os.system('chmod -R 774 {}'.format(project_path))
     add_project(project, project_path, open_project, attach)
+    os.system('chmod -R 774 {}'.format(project_path))
 
 if len(sys.argv) == 1:
     open_project('')
