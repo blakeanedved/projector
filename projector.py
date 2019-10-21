@@ -7,7 +7,7 @@ import shutil
 import re
 from pprint import pprint
 
-projectsfile = os.path.expanduser('~/dotfiles/scripts/projects')
+projectsfile = os.path.expanduser('~/projects.txt')
 projectsdirectory = os.path.expanduser('~/Documents/Projects/')
 githubusername = 'blakeanedved'
 tmuxcommand = 'env TERM=screen-256color-italic tmux'
