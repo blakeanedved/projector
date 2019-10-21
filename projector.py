@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import subprocess
@@ -7,10 +9,16 @@ import shutil
 import re
 from pprint import pprint
 
-projectsfile = os.path.expanduser('~/projects.txt')
-projectsdirectory = os.path.expanduser('~/Documents/Projects/')
-githubusername = 'blakeanedved'
-tmuxcommand = 'env TERM=screen-256color-italic tmux'
+def get_env(x, d):
+    if x in os.environ:
+        return os.environ[x]
+    else:
+        return d
+
+projectsfile = os.path.expanduser(get_env('PROJECTOR_PROJECT_FILE', '~/projects.txt'))
+projectsdirectory = os.path.expanduser(get_env('PROJECTOR_PROJECTS', '~/Documents/Projects'))
+githubusername = get_env('PROJECTOR_GITHUB_USERNAME', '')
+tmuxcommand = get_env('PROJECTOR_TMUX', 'tmux')
 
 def open_project(project, attach=True):
     with open(projectsfile, 'r+') as f:
@@ -77,9 +85,10 @@ def add_project(project, project_path, open_project_bool, attach):
         if project in projects:
             print('Project `{}` already exists, try again (Enter to abort)'.format(project))
     if project_path == '':
-        project_path = os.popen('find ' + projectsdirectory +' -type d -maxdepth 1 | fzf --height=20 --layout=reverse --border --preview="cat {}/README.md"').read().strip()
+        project_path = os.popen('tmp="$(mktemp)" ; lf -last-dir-path="$tmp" >/dev/null ; cat "$tmp" ; rm "$tmp"').read().strip()
         if project_path == '':
             print('No directory selected, aborting')
+            exit(1)
         else:
             with open(projectsfile, 'r+') as f:
                 lines = [line.strip() for line in f.readlines()]
