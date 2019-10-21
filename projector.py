@@ -16,7 +16,7 @@ def open_project(project, attach=True):
     with open(projectsfile, 'r') as f:
         projects = { name : path for name, path in [line.strip().split(' ') for line in f.readlines()]}
         if project not in projects:
-            picked_project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ~/dotfiles/scripts/projects | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
+            picked_project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ' + projectsfile + ' | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
             if picked_project == '':
                 exit()
             elif picked_project in projects:
@@ -104,7 +104,7 @@ def remove_project(project, remove_from_disk):
     with open(projectsfile, 'r') as f:
         projects = { name : path for name, path in [line.strip().split(' ') for line in f.readlines()]}
     if project == '':
-        project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ~/dotfiles/scripts/projects | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
+        project = os.popen('echo \"' + '\n'.join([key for key, value in projects.items()]) + '\" | fzf --height=20 --query=' + project + ' --layout=reverse --border --preview="cat ' + projectsfile + ' | grep \'^{} \' | sed \'s/.* //\' | sed \'s/$/\/README.md/\' | xargs cat"').read().replace('\n', '')
         if project == '':
             print('No project specified, aborting')
             return
