@@ -10,6 +10,7 @@ from pprint import pprint
 projectsfile = os.path.expanduser('~/dotfiles/scripts/projects')
 projectsdirectory = os.path.expanduser('~/Documents/Projects/')
 githubusername = 'blakeanedved'
+tmuxcommand = 'env TERM=screen-256color-italic tmux'
 
 def open_project(project, attach=True):
     with open(projectsfile, 'r') as f:
@@ -23,44 +24,44 @@ def open_project(project, attach=True):
             else:
                 print("Project {} not found".format(picked_project))
                 exit(1)
-        if os.popen('tmux ls | grep "{}:"'.format(project)).read() != '':
+        if os.popen('{} ls | grep "{}:"'.format(tmuxcommand, project)).read() != '':
             if attach:
                 print('{} session already running, connecting now'.format(project))
-                os.system('tmux a -t {}'.format(project))
+                os.system('{} a -t {}'.format(tmuxcommand, project))
             else:
                 print('{} session already running, connect with `projector open|connect {}`'.format(project, project))
             return
         if not os.path.isfile(os.path.expanduser(projects[project]) + '/.projector.yml'):
-            os.system('cd {} && tmux new-session -d -s {}'.format(projects[project], project))
+            os.system('cd {} && {} new-session -d -s {}'.format(projects[project], tmuxcommand, project))
             if attach:
-                os.system('tmux a -t {}'.format(project))
+                os.system('{} a -t {}'.format(tmuxcommand, project))
                 return
         with open(os.path.expanduser(projects[project]) + '/.projector.yml', 'r') as pyml:
             try:
                 config = yaml.safe_load(pyml)
-                os.system('cd {} && tmux new-session -d -s {}'.format(projects[project], project))
+                os.system('cd {} && {} new-session -d -s {}'.format(projects[project], tmuxcommand, project))
                 counter = 1
                 for title, options in config['wins'].items():
                     if counter > 1:
-                        os.system('tmux new-window -t {}:{}'.format(project, counter))
-                    os.system('tmux rename-window -t {}:{} "{}"'.format(project, counter, title))
-                    os.system('tmux select-window -t {}:{}'.format(project, title))
+                        os.system('{} new-window -t {}:{}'.format(tmuxcommand, project, counter))
+                    os.system('{} rename-window -t {}:{} "{}"'.format(tmuxcommand, project, counter, title))
+                    os.system('{} select-window -t {}:{}'.format(tmuxcommand, project, title))
                     counter2 = 0
                     for start_command in options['panes']:
                         if counter2 > 0:
                             # rework to be able to split on some configuration
-                            os.system('tmux split-window -v')
-                        os.system('tmux send-keys -t {}:{}.{} {} Enter'.format(project, title, counter2, start_command))
+                            os.system('{} split-window -v'.format(tmuxcommand))
+                        os.system('{} send-keys -t {}:{}.{} {} Enter'.format(tmuxcommand, project, title, counter2, start_command))
                         counter2 += 1
-                    os.system('tmux select-layout -t {}:{} {}'.format(project, title, options['layout'] if 'layout' in options else 'tiled'))
+                    os.system('{} select-layout -t {}:{} {}'.format(tmuxcommand, project, title, options['layout'] if 'layout' in options else 'tiled'))
                     if 'main-pane-height' in options:
-                        os.system('tmux set-window-option -t {}:{} main-pane-height {}'.format(project, title, options['main-pane-height']))
+                        os.system('{} set-window-option -t {}:{} main-pane-height {}'.format(tmuxcommand, project, title, options['main-pane-height']))
                     if 'main-pane-width' in options:
-                        os.system('tmux set-window-option -t {}:{} main-pane-width {}'.format(project, title, options['main-pane-width']))
+                        os.system('{} set-window-option -t {}:{} main-pane-width {}'.format(tmuxcommand, project, title, options['main-pane-width']))
                     counter += 1
-                os.system('tmux select-window -t {}:{}'.format(project, config['select'] if 'select' in config else list(config['wins'].items())[0][0]))
+                os.system('{} select-window -t {}:{}'.format(tmuxcommand, project, config['select'] if 'select' in config else list(config['wins'].items())[0][0]))
                 if attach:
-                    os.system('tmux a -t {}'.format(project))
+                    os.system('{} a -t {}'.format(tmuxcommand, project))
             except yaml.YAMLError as err:
                 print(err)
 
