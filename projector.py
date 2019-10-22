@@ -15,7 +15,7 @@ def get_env(x, d):
     else:
         return d
 
-projectsfile = os.path.expanduser(get_env('PROJECTOR_PROJECT_FILE', '~/projects.txt'))
+projectsfile = os.path.expanduser(get_env('PROJECTOR_PROJECT_FILE', '~/.projects'))
 projectsdirectory = os.path.expanduser(get_env('PROJECTOR_PROJECTS', '~/Documents/Projects'))
 githubusername = get_env('PROJECTOR_GITHUB_USERNAME', '')
 tmuxcommand = get_env('PROJECTOR_TMUX', 'tmux')
@@ -164,7 +164,11 @@ def new_project(project, project_path, github, open_project, attach):
             elif re.match('^[a-zA-Z0-9\-_$]+\/[a-zA-Z0-9\-_$]+$', github):
                 os.system('git clone https://github.com/{} {}'.format(github, project_path))
             elif re.match('^[a-zA-Z0-9\-_$]+$', github):
-                os.system('git clone https://github.com/{}/{}'.format(githubusername, github, project_path))
+                if githubusername != '':
+                    os.system('git clone https://github.com/{}/{}'.format(githubusername, github, project_path))
+                else:
+                    print('You must specify the environment varible PROJECTOR_GITHUB_USERNAME to use --github={}'.format(github))
+                    exit(0)
             else:
                 print('Invalid value for --github')
                 return
